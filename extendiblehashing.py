@@ -18,4 +18,6 @@ while(1):
     elif choice == 2:
         alpha = int(input("\nEnter a block size: "))
         simulated_secondary_memory.simulate_secondary_memory('dataset.txt',alpha)
+    elif choice == 3:
+        print("Bulk Loading here")
     
