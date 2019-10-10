@@ -1,31 +1,29 @@
-# PG Software Lab - CSP 509
+# Extendible Hashing
+PG Software Lab - CSP 509
+Major-project Specification Phase A
+Due date: Oct 23, 2019 11:55pm
+Total Weightage 23%
 
-# Major-project Specification Phase A
-
-# Due date: Oct 23, 2019 11:55pm
-
-# Total Weightage 23%
-
-**Instructions:
-●** All submissions must be made through the Moodle site for this course
-**●** Only one submission per team would be considered and graded. It would be assumed that all members of the team
+## Instructions:
+* All submissions must be made through the Moodle site for this course
+* Only one submission per team would be considered and graded. It would be assumed that all members of the team
 have participated equally and same score would be given to all members of the team.
-**●** Your submission should have names of all the members of your team.
-**●** Any assumptions made while solving the problem should be clearly stated in the solution.
-**● You can take-up this project in teams of size 2 or size 3. Teams size-3 would have to do more work in Phase B
+* Your submission should have names of all the members of your team.
+* Any assumptions made while solving the problem should be clearly stated in the solution.
+* You can take-up this project in teams of size 2 or size 3. Teams size-3 would have to do more work in Phase B
 of this project. You are not allowed to different teams across phase A and phase B of the project.**
-● As always correctness of the algorithm must be ensured.
-● TAs would be quizzing you on your code. You must understand each and every line of your submitted code. Also the
+* As always correctness of the algorithm must be ensured.
+* TAs would be quizzing you on your code. You must understand each and every line of your submitted code. Also the
 implementation specifications mentioned in the questions need to be strictly followed. Failure to adhere to these
 requirements would result in substantial loss of points.
-● Also pay attention to the scalability of the code. Your code would be tested on large datasets.
-● Very Important: Your code should not have a directory structure. All files (code + dataset + written material for
+* Also pay attention to the scalability of the code. Your code would be tested on large datasets.
+* Very Important: Your code should not have a directory structure. All files (code + dataset + written material for
 questions) should be present in just one folder. Note that this is absolutely crucial for grading this assignment.
-**In this phase,** ​you are required to implement Extendible Hashing. Specialized libraries for managing hash tables must not
+* **In this phase,** ​you are required to implement Extendible Hashing. Specialized libraries for managing hash tables must not
 be used. You may existing libraries for basic data structures like vectors and associative array (e.g, map in C++ STL
 libraries or equivalent in JAVA). You may also use math libraries as needed for tasks like, generating random numbers,
 converting to and from binary format, etc.
-**Dataset creation:**
+## Dataset creation:
 For this question, you would have to create a synthetic table (simulating sales records of department stores) containing 1
 Lakh records. Each record in this file contains four fields: (1) Transaction ID (an integer), (2) Transaction sale amount (an
 integer), (3) Customer name (string) and, (4) category of item. Transaction ID is an integer to identify each transaction
@@ -47,31 +45,35 @@ needed a later stage to perform a linear scan through the file.
 hash you would be storing the following kinds of records: {TransactionID, <Filename of the disk block which
 stores this record>}. Implementation specification of the extendible hash is given below:
 Details of Extendible Hash:**
-● We would be storing index records of the format “{TransactionID, <Filename of the disk block which stores this
+* We would be storing index records of the format “{TransactionID, <Filename of the disk block which stores this
 record>}” in the extendible hash.
-● We would hashing on “TransactionID.”
-● Ideally, the buckets in the extendible hash should be stored in the secondary memory. However, for the purpose of
+* We would hashing on “TransactionID.”
+* Ideally, the buckets in the extendible hash should be stored in the secondary memory. However, for the purpose of
 this project, they would be stored in something called “Simulated Secondary Memory (detailed below).”
-● The directory or bucket address table of the extendible hash would contain hash prefix and pointer to the bucket
+* The directory or bucket address table of the extendible hash would contain hash prefix and pointer to the bucket
 sitting in “Simulated Secondary Memory (detailed below).”
-**Simulated Secondary Memory:**
+## Simulated Secondary Memory:
 Following tips would help you achieve this.
-(a) The secondary memory can be simulated through an array of the abstract data-type “bucket”. You can fix a very
+<ol>
+<li> The secondary memory can be simulated through an array of the abstract data-type “bucket”. You can fix a very
 large size for this array.
-(b)The bucket capacity is fixed in terms of number of index records it can contain. Do not hard code this number as it
+<li> The bucket capacity is fixed in terms of number of index records it can contain. Do not hard code this number as it
 would be varied in the experiments.
-(c) Indices in this array form our “bucket address / hardware address.”
-(d)Here, the bucket abstract data-type would have the following information:
-a. Number of empty spaces
-b. An array of structures to store the index records. Length of this array is fixed according to the parameter
+<li> Indices in this array form our “bucket address / hardware address.”
+<li> Here, the bucket abstract data-type would have the following information:
+  <ol>
+  <li> Number of empty spaces
+  <li> An array of structures to store the index records. Length of this array is fixed according to the parameter
 “bucket-size” specified.
-c. Link to the next bucket (valid only if this bucket is overflowing)
-d. All buckets in the overflow chain must be linked. The last bucket of the overflow chain must have a
+  <li> Link to the next bucket (valid only if this bucket is overflowing)
+  <li> All buckets in the overflow chain must be linked. The last bucket of the overflow chain must have a
 special character denoting that it is end of the overflow chain.
-**(e) Note that in your entire code, there should be only one abstract data type for bucket for all the purposes,
+  <li> Note that in your entire code, there should be only one abstract data type for bucket for all the purposes,
 viz., records, overflow buckets for both records and directory entries.**
-(f) It is advisable to keep a separate area in the secondary memory for storing the overflow buckets.
-**(g)There should be only one instance of secondary memory running in your code.
+  <li> It is advisable to keep a separate area in the secondary memory for storing the overflow buckets.
+  <li> There should be only one instance of secondary memory running in your code.
+  </ol>
+</ol>
 Main Memory**
 (a) You can assume to have enough “main memory” for “bringing” in the buckets to be rehashed.
 (b)In addition to item (a) “Main memory” can hold upto 1024 directory entries. The rest resides in “Simulated
