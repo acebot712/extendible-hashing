@@ -1,5 +1,3 @@
-#Extendible Hashing
-
 # PG Software Lab - CSP 509
 
 # Major-project Specification Phase A
@@ -95,3 +93,5 @@ index records in the extendible hash.
 (2)Extendible hash must have a separate insert function which would insert any given arbitrary “index record” into
 the extendible hash.
 (3)Extendible hash must have a seperate intuitive visualize function for checking the correctness of the code.
+
+
