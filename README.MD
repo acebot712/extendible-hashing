@@ -1,8 +1,8 @@
 # Extendible Hashing
-PG Software Lab - CSP 509
-Major-project Specification Phase A
-Due date: Oct 23, 2019 11:55pm
-Total Weightage 23%
+PG Software Lab - CSP 509  
+Major-project Specification Phase A  
+Due date: Oct 23, 2019 11:55pm  
+Total Weightage 23%  
 
 ## Instructions:
 * All submissions must be made through the Moodle site for this course
@@ -75,25 +75,26 @@ viz., records, overflow buckets for both records and directory entries.**
   </ol>
 </ol>
 Main Memory**
-(a) You can assume to have enough “main memory” for “bringing” in the buckets to be rehashed.
-(b)In addition to item (a) “Main memory” can hold upto 1024 directory entries. The rest resides in “Simulated
+1. You can assume to have enough “main memory” for “bringing” in the buckets to be rehashed.
+2. In addition to item (a) “Main memory” can hold upto 1024 directory entries. The rest resides in “Simulated
 Secondary memory.”
-**(c) Directory entries overflowing into secondary memory would be using the same bucket abstract data type
-which was previously declared in item “Simulated Secondary Memory”.
-Other Details:**
-(a) The most significant bits are extracted to find the directory entry.
-(b)Only one directory expansion is allowed per record insertion. Following the directory expansion, you may attempt
+**3. Directory entries overflowing into secondary memory would be using the same bucket abstract data type
+which was previously declared in item “Simulated Secondary Memory”.**
+
+### Other Details:
+1. The most significant bits are extracted to find the directory entry.
+2. Only one directory expansion is allowed per record insertion. Following the directory expansion, you may attempt
 to resolve the collision (if it still persists) by increasing the local depth (if local depth < global depth). In case the
 collision is still not resolved, just create an overflow bucket.
-(c) “Main memory” can hold upto 1024 directory entries. The rest resides in “Simulated Secondary Memory.”
+3. “Main memory” can hold upto 1024 directory entries. The rest resides in “Simulated Secondary Memory.”
 
 
-**Evaluation Details:**
-(1)TAs would use a small dataset to check the running of your code. For this, they may give you a file containing
+### Evaluation Details:
+1. TAs would use a small dataset to check the running of your code. For this, they may give you a file containing
 15-20 records. You code should read this file and, break it into disk blocks (simulated as files) and then load the
 index records in the extendible hash.
-(2)Extendible hash must have a separate insert function which would insert any given arbitrary “index record” into
+2. Extendible hash must have a separate insert function which would insert any given arbitrary “index record” into
 the extendible hash.
-(3)Extendible hash must have a seperate intuitive visualize function for checking the correctness of the code.
+3. Extendible hash must have a seperate intuitive visualize function for checking the correctness of the code.
 
 
