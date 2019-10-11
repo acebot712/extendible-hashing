@@ -1,8 +1,8 @@
 import synthesizer
 import simulated_secondary_memory
-from .directory import Directory
-from .directory import DirectoryRecord
-from .bucket import Bucket
+from directory import Directory
+from directory import DirectoryRecord
+from bucket import Bucket
 
 def generate_data(lis_size,file_name):
     lis = synthesizer.generate_dataset([],lis_size)
@@ -29,25 +29,29 @@ def insert(directory,index_record):
     # 2. Convert it ot binary
     TID_binary = "{0:b}".format(TID)
     # 3. Extract global depth number of MSB given in directory.global_depth
-    hash_prefix = TID_binary[:directory.global_depth]
+    hash_prefix = TID_binary[-directory.global_depth:]
     # 4. IndexRecord to be stored in a bucket
     # search using hash prefix in directory
-    key = directory.directory_records.index(hash_prefix)
+    directory_records_prefixes = [dr.hash_prefix for dr in directory.directory_records]
+    key = directory_records_prefixes.index(hash_prefix)
     # key is my key
     # directory.directory_records[key].value is a bucket
-    
+    bucket = directory.directory_records[key].value # bucket where insertion is to be done
+    bucket.index_records.append(index_record)
+    # Insertion step complete. Now check for overflow
 
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
-for j in range(1,4):
-    with open(str(j)+'.txt','r') as fin:
-        for line in fin:
-            line_modified = line[1:].rstrip(']\n').split(', ')
-            line_modified = [int(line_modified[i]) if i!=1 else line_modified[i].strip("\'") for i in range(len(line_modified))]
-            # I have a record properly stored in a list in line_modified
-            # call insert() for all records
-            index_record = [line_modified[0],str(j)+'.txt']
-            insert(directory,index_record)
+def bulk_hash():
+    for j in range(1,4):
+        with open(str(j)+'.txt','r') as fin:
+            for line in fin:
+                line_modified = line[1:].rstrip(']\n').split(', ')
+                line_modified = [int(line_modified[i]) if i!=1 else line_modified[i].strip("\'") for i in range(len(line_modified))]
+                # I have a record properly stored in a list in line_modified
+                # call insert() for all records
+                index_record = [line_modified[0],str(j)+'.txt']
+                insert(directory,index_record)
 
 #%%
     
@@ -65,5 +69,8 @@ while(1):
         alpha = int(input("\nEnter a block size: "))
         simulated_secondary_memory.simulate_secondary_memory('dataset.txt',alpha)
     elif choice == 3:
+        print("\nBucket List\n {}".format(bucket_list[0].index_records))
+        print("Bucket List\n {}".format(bucket_list[1].index_records))
         bulk_hash()
-    
+        print("\nBucket List\n {}".format(bucket_list[0].index_records))
+        print("Bucket List\n {}".format(bucket_list[1].index_records))

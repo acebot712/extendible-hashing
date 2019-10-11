@@ -6,9 +6,9 @@ Created on Thu Oct 10 18:59:14 2019
 """
 
 class DirectoryRecord:
-    def __init__(self, hash_prefix):
-        self.hash_prefix = hash_prefix
-        self.value = None
+    def __init__(self, hash_prefix,value):
+        self.hash_prefix = hash_prefix # Its a string
+        self.value = value # value is a bucket
 
 class Directory:
     def __init__(self,global_depth,directory_records):
