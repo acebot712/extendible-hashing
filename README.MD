@@ -1,8 +1,6 @@
 # Extendible Hashing
 PG Software Lab - CSP 509  
 Major-project Specification Phase A  
-Due date: Oct 23, 2019 11:55pm  
-Total Weightage 23%  
 
 ## Instructions:
 * All submissions must be made through the Moodle site for this course

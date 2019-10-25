@@ -37,6 +37,7 @@ def insert(directory,index_record):
     bucket = directory.directory_records[hash_prefix].value # bucket where insertion is to be done
     bucket.index_records.append(index_record)
     # Insertion step complete. Now check for overflow
+    bucket.empty_spaces = bucket.empty_spaces - 1
 
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
