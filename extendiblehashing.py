@@ -64,7 +64,7 @@ while(1):
     choice = int(input())
 
     if choice == 1:
-        generate_data(10,'dataset.txt') #passing list size, file name
+        generate_data(int(input("\nEnter how number of records for 'dataset.txt': ")),'dataset.txt') #passing list size, file name
     elif choice == 2:
         alpha = int(input("\nEnter a block size: "))
         simulated_secondary_memory.simulate_secondary_memory('dataset.txt',alpha)
