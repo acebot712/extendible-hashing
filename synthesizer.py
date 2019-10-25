@@ -7,9 +7,10 @@ def random_string(string_length=3):
 
 """ utility functions to generate dataset """
 def generate_dataset(lis,n): # for 1lac elements
-    for i in range(0,n):
+    TID_list = random.sample(range(50000,200001),n)
+    for i in range(n):
         single_rec=[]
-        single_rec.append(i)
+        single_rec.append(TID_list[i])
         single_rec.append(random_string())
         single_rec.append(random.randint(0,50000)+1)
         single_rec.append(random.randint(0,1500)+1)    
