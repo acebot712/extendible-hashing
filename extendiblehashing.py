@@ -15,11 +15,12 @@ bucket_list.append(Bucket(local_depth = 1, index_records = [], empty_spaces = em
 bucket_list.append(Bucket(local_depth = 1, index_records = [], empty_spaces = empty_spaces))   
 
 directory_records = [] # list of hash prefix with bucket pointers
-directory_records.append(DirectoryRecord(hash_prefix = "0", value = bucket_list[0]))
-directory_records.append(DirectoryRecord(hash_prefix = "1", value = bucket_list[1]))
+directory_records.append(DirectoryRecord(hash_prefix = 0, value = bucket_list[0]))
+directory_records.append(DirectoryRecord(hash_prefix = 1, value = bucket_list[1]))
 
 # Declaring the directory here
 directory = Directory(global_depth = 1, directory_records = directory_records) # Directory initialized here with global depth 1
+
 
 #%%
 """ insert function """    
@@ -38,7 +39,39 @@ def insert(directory,index_record):
     bucket.index_records.append(index_record)
     # Insertion step complete. Now check for overflow
     bucket.empty_spaces = bucket.empty_spaces - 1
-
+    if(bucket.empty_spaces < 0):    #Overflow
+        temp_index_records = bucket.index_records # temp list for rehashing
+        bucket.index_records = []
+        if(directory.global_depth > bucket.local_depth):
+            num_links = 2**(directory.global_depth - bucket.local_depth) # num links to same bucket
+            num_links_modify = num_links/2 # second half of the links to be changed
+            bucket.local_depth = bucket.local_depth + 1
+            new_bucket = Bucket(local_depth=bucket.local_depth,index_records=[],empty_spaces=empty_spaces)
+            for dr in directory.directory_records:
+                if(dr.value == bucket):
+                    if(num_links_modify != 0):
+                        num_links_modify = num_links_modify - 1
+                    else:
+                        dr.value = new_bucket
+                        for ir in temp_index_records:
+                            insert(directory,ir)
+        elif(directory.global_depth == bucket.local_depth): # address expansion
+            num_new_directory_records = len(directory.directory_records) * 2
+            new_directory_records = []
+            for drhash in range(num_new_directory_records): # keys added to new_directory
+                new_directory_records.append(DirectoryRecord(hash_prefix=drhash,value=None))
+            new_directory = Directory(global_depth=directory.global_depth + 1,directory_records=new_directory_records)
+            # Creating new directory complete
+            # Create links to appropriate bucket in new directory now
+            for dr_index in range(num_new_directory_records):
+                match_index = format(new_directory.directory_records[dr_index].hash_prefix,'0'+str(new_directory.global_depth)+'b')[:-1]
+                match_index = int(match_index,2)
+                new_directory.directory_records[dr_index].value = directory.directory_records[match_index].value
+            directory = new_directory
+            for ir in temp_index_records:
+                insert(directory,ir)
+            
+            
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
 def bulk_hash():
