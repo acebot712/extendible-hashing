@@ -104,5 +104,5 @@ while(1):
         print("\nBucket List\n {}".format(bucket_list[0].index_records))
         print("Bucket List\n {}".format(bucket_list[1].index_records))
         bulk_hash()
-        print("\nBucket List\n {}".format(bucket_list[0].index_records))
-        print("Bucket List\n {}".format(bucket_list[1].index_records))
+        for bucket in bucket_list:
+            print("Bucket List1\n {}".format(bucket.index_records))
