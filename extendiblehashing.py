@@ -19,7 +19,7 @@ directory_records.append(DirectoryRecord(hash_prefix = "0", value = bucket_list[
 directory_records.append(DirectoryRecord(hash_prefix = "1", value = bucket_list[1]))
 
 # Declaring the directory here
-directory = Directory(global_depth = 1, directory_records = directory_records) # Directory initialized here with global depth 0
+directory = Directory(global_depth = 1, directory_records = directory_records) # Directory initialized here with global depth 1
 
 #%%
 """ insert function """    
@@ -27,23 +27,21 @@ def insert(directory,index_record):
     # 1. Extract TID
     TID = index_record[0]
     # 2. Convert it ot binary
-    TID_binary = "{0:b}".format(TID)
+    TID_binary = format(TID,'018b')
     # 3. Extract global depth number of MSB given in directory.global_depth
-    hash_prefix = TID_binary[-directory.global_depth:]
+    hash_prefix = int(TID_binary[:directory.global_depth],2) #in decimal
     # 4. IndexRecord to be stored in a bucket
     # search using hash prefix in directory
-    directory_records_prefixes = [dr.hash_prefix for dr in directory.directory_records]
-    key = directory_records_prefixes.index(hash_prefix)
-    # key is my key
+    # key is hash_prefix itself
     # directory.directory_records[key].value is a bucket
-    bucket = directory.directory_records[key].value # bucket where insertion is to be done
+    bucket = directory.directory_records[hash_prefix].value # bucket where insertion is to be done
     bucket.index_records.append(index_record)
     # Insertion step complete. Now check for overflow
 
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
 def bulk_hash():
-    for j in range(1,4):
+    for j in range(1,4): #This range needs to be changed
         with open(str(j)+'.txt','r') as fin:
             for line in fin:
                 line_modified = line[1:].rstrip(']\n').split(', ')
@@ -59,7 +57,7 @@ while(1):
     print("\nEnter A Choice: ")
     print("1. Generate Data")
     print("2. Simulate Secondary Memory")
-    print("3. Insert Record")
+    print("3. Bulk Hash")
     print("4. Visualize Extendible hash")
     choice = int(input())
 
