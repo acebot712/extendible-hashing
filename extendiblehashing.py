@@ -25,6 +25,7 @@ directory = Directory(global_depth = 1, directory_records = directory_records) #
 #%%
 """ insert function """    
 def insert(directory,index_record):
+    
     # 1. Extract TID
     TID = index_record[0]
     # 2. Convert it ot binary
@@ -39,24 +40,32 @@ def insert(directory,index_record):
     bucket.index_records.append(index_record)
     # Insertion step complete. Now check for overflow
     bucket.empty_spaces = bucket.empty_spaces - 1
+    
     if(bucket.empty_spaces < 0):    #Overflow
+        print("Overflow")
         temp_index_records = bucket.index_records # temp list for rehashing
         bucket.index_records = []
+        bucket.empty_spaces=empty_spaces
         if(directory.global_depth > bucket.local_depth):
+            print("BS")
             num_links = 2**(directory.global_depth - bucket.local_depth) # num links to same bucket
             num_links_modify = num_links/2 # second half of the links to be changed
             bucket.local_depth = bucket.local_depth + 1
             new_bucket = Bucket(local_depth=bucket.local_depth,index_records=[],empty_spaces=empty_spaces)
+            bucket_list.append(new_bucket)
+            print("Bucket List len: {}".format(len(bucket_list)))
             for dr in directory.directory_records:
                 if(dr.value == bucket):
                     if(num_links_modify != 0):
                         num_links_modify = num_links_modify - 1
                     else:
-                        dr.value = new_bucket
+                        dr.value = bucket_list[-1] # Pointer to new_bucket
                         for ir in temp_index_records:
                             insert(directory,ir)
         elif(directory.global_depth == bucket.local_depth): # address expansion
+            print("AE")
             num_new_directory_records = len(directory.directory_records) * 2
+            print("Directory Records: {}".format(num_new_directory_records))
             new_directory_records = []
             for drhash in range(num_new_directory_records): # keys added to new_directory
                 new_directory_records.append(DirectoryRecord(hash_prefix=drhash,value=None))
@@ -75,7 +84,7 @@ def insert(directory,index_record):
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
 def bulk_hash():
-    for j in range(1,4): #This range needs to be changed
+    for j in range(1,4): #This range needs to be changed, just reads 3 records now
         with open(str(j)+'.txt','r') as fin:
             for line in fin:
                 line_modified = line[1:].rstrip(']\n').split(', ')
@@ -103,6 +112,8 @@ while(1):
     elif choice == 3:
         print("\nBucket List\n {}".format(bucket_list[0].index_records))
         print("Bucket List\n {}".format(bucket_list[1].index_records))
+        print("Bucket List len: {}".format(len(bucket_list)))
         bulk_hash()
+        
         for bucket in bucket_list:
             print("Bucket List1\n {}".format(bucket.index_records))
