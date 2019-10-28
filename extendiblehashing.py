@@ -21,15 +21,14 @@ directory_records.append(DirectoryRecord(hash_prefix = 1, value = bucket_list[1]
 # Declaring the directory here
 directory = Directory(global_depth = 1, directory_records = directory_records) # Directory initialized here with global depth 1
 
-
 #%%
 """ insert function """    
-def insert(directory,index_record):
-    
+def insert(index_record):
+    global directory
     # 1. Extract TID
     TID = index_record[0]
     # 2. Convert it ot binary
-    TID_binary = format(TID,'018b')
+    TID_binary = format(TID,'05b')
     # 3. Extract global depth number of MSB given in directory.global_depth
     hash_prefix = int(TID_binary[:directory.global_depth],2) #in decimal
     # 4. IndexRecord to be stored in a bucket
@@ -40,7 +39,7 @@ def insert(directory,index_record):
     bucket.index_records.append(index_record)
     # Insertion step complete. Now check for overflow
     bucket.empty_spaces = bucket.empty_spaces - 1
-    
+
     if(bucket.empty_spaces < 0):    #Overflow
         print("Overflow")
         temp_index_records = bucket.index_records # temp list for rehashing
@@ -53,38 +52,47 @@ def insert(directory,index_record):
             bucket.local_depth = bucket.local_depth + 1
             new_bucket = Bucket(local_depth=bucket.local_depth,index_records=[],empty_spaces=empty_spaces)
             bucket_list.append(new_bucket)
-            print("Bucket List len: {}".format(len(bucket_list)))
+            # print("Bucket List len: {}".format(len(bucket_list)))
             for dr in directory.directory_records:
+                # print(bucket)
                 if(dr.value == bucket):
+                    
                     if(num_links_modify != 0):
                         num_links_modify = num_links_modify - 1
                     else:
                         dr.value = bucket_list[-1] # Pointer to new_bucket
-                        for ir in temp_index_records:
-                            insert(directory,ir)
+            for i in range(len(temp_index_records)):
+                insert(temp_index_records[i])
+                print(temp_index_records[i])
+                print(directory.global_depth)
         elif(directory.global_depth == bucket.local_depth): # address expansion
             print("AE")
             num_new_directory_records = len(directory.directory_records) * 2
-            print("Directory Records: {}".format(num_new_directory_records))
+            # print("Directory Records: {}".format(num_new_directory_records))
             new_directory_records = []
             for drhash in range(num_new_directory_records): # keys added to new_directory
                 new_directory_records.append(DirectoryRecord(hash_prefix=drhash,value=None))
             new_directory = Directory(global_depth=directory.global_depth + 1,directory_records=new_directory_records)
+                            # ALL right till here
+
             # Creating new directory complete
             # Create links to appropriate bucket in new directory now
             for dr_index in range(num_new_directory_records):
                 match_index = format(new_directory.directory_records[dr_index].hash_prefix,'0'+str(new_directory.global_depth)+'b')[:-1]
                 match_index = int(match_index,2)
                 new_directory.directory_records[dr_index].value = directory.directory_records[match_index].value
-            directory = new_directory
-            for ir in temp_index_records:
-                insert(directory,ir)
+                # print("Bucket Data in order:\n{}".format(new_directory.directory_records[dr_index].value.index_records))
+            directory = new_directory # Reassign old directory
+            for i in range(len(temp_index_records)):
+                print("2nd for loop "+str(directory.global_depth))
+                print(temp_index_records[i])
+                insert(temp_index_records[i])
             
             
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
 def bulk_hash():
-    for j in range(1,4): #This range needs to be changed, just reads 3 records now
+    for j in range(1,5): #This range needs to be changed, just reads 3 records now
         with open(str(j)+'.txt','r') as fin:
             for line in fin:
                 line_modified = line[1:].rstrip(']\n').split(', ')
@@ -92,7 +100,7 @@ def bulk_hash():
                 # I have a record properly stored in a list in line_modified
                 # call insert() for all records
                 index_record = [line_modified[0],str(j)+'.txt']
-                insert(directory,index_record)
+                insert(index_record)
 
 #%%
     
@@ -110,10 +118,7 @@ while(1):
         alpha = int(input("\nEnter a block size: "))
         simulated_secondary_memory.simulate_secondary_memory('dataset.txt',alpha)
     elif choice == 3:
-        print("\nBucket List\n {}".format(bucket_list[0].index_records))
-        print("Bucket List\n {}".format(bucket_list[1].index_records))
-        print("Bucket List len: {}".format(len(bucket_list)))
         bulk_hash()
-        
+        # visualize
         for bucket in bucket_list:
             print("Bucket List1\n {}".format(bucket.index_records))
