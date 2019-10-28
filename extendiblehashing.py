@@ -87,8 +87,8 @@ def insert(index_record):
                 print("2nd for loop "+str(directory.global_depth))
                 print(temp_index_records[i])
                 insert(temp_index_records[i])
-            
-            
+
+#%%
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
 def bulk_hash():
@@ -101,6 +101,14 @@ def bulk_hash():
                 # call insert() for all records
                 index_record = [line_modified[0],str(j)+'.txt']
                 insert(index_record)
+
+#%%
+def visualize():
+    global directory
+    print("\nGlobal depth: "+str(directory.global_depth)+"\n")
+    for i in directory.directory_records:
+        print("Hash Prefix: {}\n-> {}\nLocal depth: {}\n"
+              .format(i.hash_prefix,i.value.index_records,i.value.local_depth))
 
 #%%
     
@@ -122,3 +130,5 @@ while(1):
         # visualize
         for bucket in bucket_list:
             print("Bucket List1\n {}".format(bucket.index_records))
+    elif choice == 4:
+        visualize()
