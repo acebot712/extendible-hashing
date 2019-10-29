@@ -67,27 +67,45 @@ def insert(index_record):
         elif(directory.global_depth == bucket.local_depth): # address expansion
             print("AE")
             if bucket.next != None:
-                bucket.index_records.append(temp_index_records[:-1])
-                while bucket.next != None:
-                    bucket = bucket.next
-                if bucket.empty_spaces > 0:
+                temp = bucket
+                temp.index_records = temp_index_records[:-1]    # culprit1
+                print("LOOOLL: {}".format(temp_index_records))
+                bucket.empty_spaces = 0
+                while temp.next != None:
+                    temp = temp.next
+                if temp.empty_spaces > 0:
                     # insert in the overflow bucket
-                    bucket.index_records.append(temp_index_records[-1])
-                    bucket.empty_spaces = bucket.empty_spaces - 1
+                    temp.index_records.append(temp_index_records[-1])
+                    temp.empty_spaces = temp.empty_spaces - 1
+                    return
                 else:
                     # address expand, then create new overflow bucket with trigger
+                    
                     if chain_trigger == TID:
                         chain_trigger = 0
+                        bucket.index_records = temp_index_records[:-1] #culprit2
+                        print("iss portion")
+                        bucket.empty_spaces = 0
                         # Create new overflow bucket
-                        bucket.next = Bucket(local_depth = bucket.local_depth, index_records = [temp_index_records[-1]], empty_spaces = empty_spaces - 1)
+                        temp.next = Bucket(local_depth = bucket.local_depth, index_records = [temp_index_records[-1]], empty_spaces = empty_spaces - 1)
+                        return
                     else:
                         chain_trigger = TID
+                        
+                        bucket.index_records = []
+                        bucket.empty_spaces = empty_spaces
+                        print("Happy BDay")
                         pass
             else:
+                
                 if chain_trigger == TID:
                     chain_trigger = 0
+                    bucket.index_records = temp_index_records[:-1] #culprit3
+                    bucket.empty_spaces = 0
+                    print("Lool2")
                     # Create new overflow bucket
                     bucket.next = Bucket(local_depth = bucket.local_depth, index_records = [temp_index_records[-1]], empty_spaces = empty_spaces - 1)
+                    return
                 else:
                     chain_trigger = TID
                     pass
