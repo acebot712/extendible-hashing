@@ -9,7 +9,7 @@ def generate_data(lis_size,file_name):
     synthesizer.write_to_file(lis,file_name)
 
 """ Entire operation needs to be put in a function at least """
-empty_spaces = 3
+empty_spaces = 2
 bucket_list = [] # list of buckets
 bucket_list.append(Bucket(local_depth = 1, index_records = [], empty_spaces = empty_spaces))
 bucket_list.append(Bucket(local_depth = 1, index_records = [], empty_spaces = empty_spaces))   
@@ -21,10 +21,11 @@ directory_records.append(DirectoryRecord(hash_prefix = 1, value = bucket_list[1]
 # Declaring the directory here
 directory = Directory(global_depth = 1, directory_records = directory_records) # Directory initialized here with global depth 1
 
+chain_trigger = 0
 #%%
 """ insert function """    
 def insert(index_record):
-    global directory
+    global directory,chain_trigger
     # 1. Extract TID
     TID = index_record[0]
     # 2. Convert it ot binary
@@ -63,10 +64,35 @@ def insert(index_record):
                         dr.value = bucket_list[-1] # Pointer to new_bucket
             for i in range(len(temp_index_records)):
                 insert(temp_index_records[i])
-                print(temp_index_records[i])
-                print(directory.global_depth)
         elif(directory.global_depth == bucket.local_depth): # address expansion
             print("AE")
+            if bucket.next != None:
+                bucket.index_records.append(temp_index_records[:-1])
+                while bucket.next != None:
+                    bucket = bucket.next
+                if bucket.empty_spaces > 0:
+                    # insert in the overflow bucket
+                    bucket.index_records.append(temp_index_records[-1])
+                    bucket.empty_spaces = bucket.empty_spaces - 1
+                else:
+                    # address expand, then create new overflow bucket with trigger
+                    if chain_trigger == TID:
+                        chain_trigger = 0
+                        # Create new overflow bucket
+                        bucket.next = Bucket(local_depth = bucket.local_depth, index_records = [temp_index_records[-1]], empty_spaces = empty_spaces - 1)
+                    else:
+                        chain_trigger = TID
+                        pass
+            else:
+                if chain_trigger == TID:
+                    chain_trigger = 0
+                    # Create new overflow bucket
+                    bucket.next = Bucket(local_depth = bucket.local_depth, index_records = [temp_index_records[-1]], empty_spaces = empty_spaces - 1)
+                else:
+                    chain_trigger = TID
+                    pass
+                    
+                
             num_new_directory_records = len(directory.directory_records) * 2
             # print("Directory Records: {}".format(num_new_directory_records))
             new_directory_records = []
@@ -107,8 +133,7 @@ def visualize():
     global directory
     print("\nGlobal depth: "+str(directory.global_depth)+"\n")
     for i in directory.directory_records:
-        print("Hash Prefix: {}\n-> {}\nLocal depth: {}\n"
-              .format(i.hash_prefix,i.value.index_records,i.value.local_depth))
+        print("Hash Prefix: {}\n-> {}\nLocal depth: {}\n".format(i.hash_prefix,i.value.index_records,i.value.local_depth))
 
 #%%
     
