@@ -4,7 +4,6 @@ from directory import Directory
 from directory import DirectoryRecord
 from bucket import Bucket
 from file_converter import file_converter
-import math
 
 def generate_data(lis_size,file_name):
     lis = synthesizer.generate_dataset([],lis_size)
@@ -174,6 +173,7 @@ while(1):
     print("4. Bulk Hash")
     print("5. Insert an Index Record")
     print("6. Visualize Extendible hash")
+    print("7. Visualize Secondary Memory (Warninig: Might crash your system)")
     choice = int(input())
 
     if choice == 1:
@@ -192,3 +192,8 @@ while(1):
         insert([tid,fname])
     elif choice == 6:
         visualize()
+    elif choice == 7:
+        print(bucket_list)
+        if(len(directory.directory_records)>=3):
+            for i in range(2,len(directory.directory_records)):
+                print(directory.directory_records[i].value)
