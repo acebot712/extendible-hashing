@@ -4,23 +4,22 @@ from directory import Directory
 from directory import DirectoryRecord
 from bucket import Bucket
 from file_converter import file_converter
+import math
 
 def generate_data(lis_size,file_name):
     lis = synthesizer.generate_dataset([],lis_size)
     synthesizer.write_to_file(lis,file_name)
 
 """ Entire operation needs to be put in a function at least """
-empty_spaces = 2
+empty_spaces = int(input("Enter Bucket Size: "))
 bucket_list = [] # list of buckets
-bucket_list.append(Bucket(local_depth = 1, index_records = [], empty_spaces = empty_spaces))
-bucket_list.append(Bucket(local_depth = 1, index_records = [], empty_spaces = empty_spaces))   
+bucket_list.append(Bucket(local_depth = 0, index_records = [], empty_spaces = empty_spaces))
 
 directory_records = [] # list of hash prefix with bucket pointers
 directory_records.append(DirectoryRecord(hash_prefix = 0, value = bucket_list[0]))
-directory_records.append(DirectoryRecord(hash_prefix = 1, value = bucket_list[1]))
 
 # Declaring the directory here
-directory = Directory(global_depth = 1, directory_records = directory_records) # Directory initialized here with global depth 1
+directory = Directory(global_depth = 0, directory_records = directory_records) # Directory initialized here with global depth 1
 
 chain_trigger = 0
 
@@ -31,9 +30,12 @@ def insert(index_record):
     # 1. Extract TID
     TID = index_record[0]
     # 2. Convert it ot binary
-    TID_binary = format(TID,'05b')
+    TID_binary = format(TID,'018b')
     # 3. Extract global depth number of MSB given in directory.global_depth
-    hash_prefix = int(TID_binary[:directory.global_depth],2) #in decimal
+    if TID_binary[:directory.global_depth]=='':
+        hash_prefix = 0
+    else:
+        hash_prefix = int(TID_binary[:directory.global_depth],2) #in decimal
     # 4. IndexRecord to be stored in a bucket
     # search using hash prefix in directory
     # key is hash_prefix itself
@@ -44,12 +46,10 @@ def insert(index_record):
     bucket.empty_spaces = bucket.empty_spaces - 1
 
     if(bucket.empty_spaces < 0):    #Overflow
-        print("Overflow")
         temp_index_records = bucket.index_records # temp list for rehashing
         bucket.index_records = []
         bucket.empty_spaces=empty_spaces
         if(directory.global_depth > bucket.local_depth):
-            print("BS")
             num_links = 2**(directory.global_depth - bucket.local_depth) # num links to same bucket
             num_links_modify = num_links/2 # second half of the links to be changed
             bucket.local_depth = bucket.local_depth + 1
@@ -67,11 +67,9 @@ def insert(index_record):
             for i in range(len(temp_index_records)):
                 insert(temp_index_records[i])
         elif(directory.global_depth == bucket.local_depth): # address expansion
-            print("AE")
             if bucket.next != None:
                 temp = bucket
                 temp.index_records = temp_index_records[:-1]    # culprit1
-                print("LOOOLL: {}".format(temp_index_records))
                 bucket.empty_spaces = 0
                 while temp.next != None:
                     temp = temp.next
@@ -86,7 +84,6 @@ def insert(index_record):
                     if chain_trigger == TID:
                         chain_trigger = 0
                         bucket.index_records = temp_index_records[:-1] #culprit2
-                        print("iss portion")
                         bucket.empty_spaces = 0
                         # Create new overflow bucket
                         temp.next = Bucket(local_depth = bucket.local_depth, index_records = [temp_index_records[-1]], empty_spaces = empty_spaces - 1)
@@ -96,7 +93,6 @@ def insert(index_record):
                         
                         bucket.index_records = []
                         bucket.empty_spaces = empty_spaces
-                        print("Happy BDay")
                         pass
             else:
                 
@@ -104,7 +100,6 @@ def insert(index_record):
                     chain_trigger = 0
                     bucket.index_records = temp_index_records[:-1] #culprit3
                     bucket.empty_spaces = 0
-                    print("Lool2")
                     # Create new overflow bucket
                     bucket.next = Bucket(local_depth = bucket.local_depth, index_records = [temp_index_records[-1]], empty_spaces = empty_spaces - 1)
                     return
@@ -125,24 +120,25 @@ def insert(index_record):
             # Create links to appropriate bucket in new directory now
             for dr_index in range(num_new_directory_records):
                 match_index = format(new_directory.directory_records[dr_index].hash_prefix,'0'+str(new_directory.global_depth)+'b')[:-1]
-                match_index = int(match_index,2)
+                if match_index == '':
+                    match_index = 0
+                else:
+                    match_index = int(match_index,2)
                 new_directory.directory_records[dr_index].value = directory.directory_records[match_index].value
                 # print("Bucket Data in order:\n{}".format(new_directory.directory_records[dr_index].value.index_records))
             directory = new_directory # Reassign old directory
             for i in range(len(temp_index_records)):
-                print("2nd for loop "+str(directory.global_depth))
-                print(temp_index_records[i])
                 insert(temp_index_records[i])
 
 #%%
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
-def bulk_hash():
-    for j in range(1,5): #This range needs to be changed, just reads 3 records now
+def bulk_hash(num_of_blocks):
+    for j in range(1,num_of_blocks): #This range needs to be changed, just reads 3 records now
         with open(str(j)+'.txt','r') as fin:
             for line in fin:
                 line_modified = line[1:].rstrip(']\n').split(', ')
-                line_modified = [int(line_modified[i]) if i!=1 else line_modified[i].strip("\'") for i in range(len(line_modified))]
+                line_modified = [int(line_modified[i]) if i!=2 else line_modified[i].strip("\'") for i in range(len(line_modified))]
                 # I have a record properly stored in a list in line_modified
                 # call insert() for all records
                 index_record = [line_modified[0],str(j)+'.txt']
@@ -168,20 +164,23 @@ while(1):
     print("2. File Converter")
     print("3. Simulate Secondary Memory")
     print("4. Bulk Hash")
-    print("5. Visualize Extendible hash")
+    print("5. Insert an Index Record")
+    print("6. Visualize Extendible hash")
     choice = int(input())
 
     if choice == 1:
-        generate_data(int(input("\nEnter how number of records for 'dataset.txt': ")),'dataset.txt') #passing list size, file name
+        total_index_records = int(input("\nEnter how number of records for 'dataset.txt': "))
+        generate_data(total_index_records,'dataset.txt') #passing list size, file name
     elif choice == 2:
         file_converter('input.txt','dataset.txt')
     elif choice == 3:
         alpha = int(input("\nEnter a block size: "))
         simulated_secondary_memory.simulate_secondary_memory('dataset.txt',alpha)
     elif choice == 4:
-        bulk_hash()
-        # visualize
-        for bucket in bucket_list:
-            print("Bucket List1\n {}".format(bucket.index_records))
+        bulk_hash(math.ceil(total_index_records/alpha) + 1)
     elif choice == 5:
+        tid = int(input("Enter TID: "))
+        fname = input("Enter blockname (filename) where TID is stored: ")
+        insert([tid,fname])
+    elif choice == 6:
         visualize()
