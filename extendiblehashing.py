@@ -133,16 +133,24 @@ def insert(index_record):
 #%%
 """ Complete this part after writing insert() """
 """ file handling for bulkloading done here """
-def bulk_hash(num_of_blocks):
-    for j in range(1,num_of_blocks): #This range needs to be changed, just reads 3 records now
+def bulk_hash():
+    j = 1
+    while(1): #This range needs to be changed, just reads 3 records now
         with open(str(j)+'.txt','r') as fin:
             for line in fin:
-                line_modified = line[1:].rstrip(']\n').split(', ')
-                line_modified = [int(line_modified[i]) if i!=2 else line_modified[i].strip("\'") for i in range(len(line_modified))]
-                # I have a record properly stored in a list in line_modified
-                # call insert() for all records
-                index_record = [line_modified[0],str(j)+'.txt']
-                insert(index_record)
+                if line[0] != '[':
+                    if line[0] != '#':
+                        j = int(line[0])
+                        break
+                    else:
+                        return
+                else:
+                    line_modified = line[1:].rstrip(']\n').split(', ')
+                    line_modified = [int(line_modified[i]) if i!=2 else line_modified[i].strip("\'") for i in range(len(line_modified))]
+                    # I have a record properly stored in a list in line_modified
+                    # call insert() for all records
+                    index_record = [line_modified[0],str(j)+'.txt']
+                    insert(index_record)
 
 #%%
 def visualize():
@@ -172,12 +180,12 @@ while(1):
         total_index_records = int(input("\nEnter how number of records for 'dataset.txt': "))
         generate_data(total_index_records,'dataset.txt') #passing list size, file name
     elif choice == 2:
-        file_converter('input.txt','dataset.txt')
+        file_converter(input("Enter file name for conversion: "),'dataset.txt')
     elif choice == 3:
         alpha = int(input("\nEnter a block size: "))
         simulated_secondary_memory.simulate_secondary_memory('dataset.txt',alpha)
     elif choice == 4:
-        bulk_hash(math.ceil(total_index_records/alpha) + 1)
+        bulk_hash()
     elif choice == 5:
         tid = int(input("Enter TID: "))
         fname = input("Enter blockname (filename) where TID is stored: ")
