@@ -3,6 +3,7 @@ import simulated_secondary_memory
 from directory import Directory
 from directory import DirectoryRecord
 from bucket import Bucket
+from file_converter import file_converter
 
 def generate_data(lis_size,file_name):
     lis = synthesizer.generate_dataset([],lis_size)
@@ -22,6 +23,7 @@ directory_records.append(DirectoryRecord(hash_prefix = 1, value = bucket_list[1]
 directory = Directory(global_depth = 1, directory_records = directory_records) # Directory initialized here with global depth 1
 
 chain_trigger = 0
+
 #%%
 """ insert function """    
 def insert(index_record):
@@ -151,27 +153,35 @@ def visualize():
     global directory
     print("\nGlobal depth: "+str(directory.global_depth)+"\n")
     for i in directory.directory_records:
-        print("Hash Prefix: {}\n-> {}\nLocal depth: {}\n".format(i.hash_prefix,i.value.index_records,i.value.local_depth))
-
-#%%
+        print("Hash Prefix: {}\n-> {}".format(i.hash_prefix,i.value.index_records))
+        while(1):
+            if(i.value.next != None):
+                i.value = i.value.next
+                print("-> {}".format(i.value.index_records))
+            else:
+                break
+        print("Local Depth: {}\n".format(i.value.local_depth))
     
 while(1):
     print("\nEnter A Choice: ")
     print("1. Generate Data")
-    print("2. Simulate Secondary Memory")
-    print("3. Bulk Hash")
-    print("4. Visualize Extendible hash")
+    print("2. File Converter")
+    print("3. Simulate Secondary Memory")
+    print("4. Bulk Hash")
+    print("5. Visualize Extendible hash")
     choice = int(input())
 
     if choice == 1:
         generate_data(int(input("\nEnter how number of records for 'dataset.txt': ")),'dataset.txt') #passing list size, file name
     elif choice == 2:
+        file_converter('input.txt','dataset.txt')
+    elif choice == 3:
         alpha = int(input("\nEnter a block size: "))
         simulated_secondary_memory.simulate_secondary_memory('dataset.txt',alpha)
-    elif choice == 3:
+    elif choice == 4:
         bulk_hash()
         # visualize
         for bucket in bucket_list:
             print("Bucket List1\n {}".format(bucket.index_records))
-    elif choice == 4:
+    elif choice == 5:
         visualize()

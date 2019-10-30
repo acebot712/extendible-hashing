@@ -7,7 +7,7 @@ def simulate_secondary_memory(file_name,alpha):
         j = 1
         for line in fin:
             line_modified = line[1:].rstrip(']\n').split(', ')
-            line_modified = [int(line_modified[i]) if i!=1 else line_modified[i].strip("\'") for i in range(len(line_modified))]
+            line_modified = [int(line_modified[i]) if i!=2 else line_modified[i].strip("\'") for i in range(len(line_modified))]
             with open(str(j)+'.txt','a+') as fout:
                 fout.write(str(line_modified))
                 fout.write("\n")

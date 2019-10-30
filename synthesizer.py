@@ -11,8 +11,8 @@ def generate_dataset(lis,n): # for 1lac elements
     for i in range(n):
         single_rec=[]
         single_rec.append(TID_list[i])
-        single_rec.append(random_string())
         single_rec.append(random.randint(0,50000)+1)
+        single_rec.append(random_string())
         single_rec.append(random.randint(0,1500)+1)    
         lis.append(single_rec)
     return lis
